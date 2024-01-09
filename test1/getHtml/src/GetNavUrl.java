@@ -48,4 +48,14 @@ public class GetNavUrl {
 
         }
     }
+
+    public void getWholeText(){
+        String res = " ";
+        for(Map.Entry<String, String> entry:urlMap.entrySet()){
+            String text = GetHtml.getText(entry.getValue());
+            res+=text;
+            res += "\n\n\n";
+        }
+        GetHtml.exportTxt("WholeText", res);
+    }
 }
