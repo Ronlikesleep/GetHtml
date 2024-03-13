@@ -1,0 +1,23 @@
+General Info | Aboard Docs Products The Exchange Aboard Asset Management 📖Tokenomics For Beginner Video Tutorials Asset Management Tutorials For Fund Managers For Investors Financial Terms What are Futures and Perpetual Futures? Why Indices and Index Futures Matter? Order Book and Spread Explained What are Market Makers and Market Takers? Risk Management Avoid Getting Rekt How to Hedge your ANC Principal when participating in liquidity mining on Anchor? Trading Understanding Candlestick Charts How to Read Support and Resistance Market Order vs. Limit Order: When to Use Which? For developer API General Info Public Data Trades Endpoints Account Endpoints Market Data Endpoints WebSocket Public Information Streams WebSocket Private Information Streams Signature Operation GitHub Implementation Perpetuals Futures Expected Changes in Accounts Multi-position liquidation price calculation Multi-positions bankruptcy price calculation Funding Calculation Indices Aboard DeFi-20 Index Methodology Price Feeds Fund Terms Fees Social Media Powered by GitBook General API Information The base endpoint for REST API ； https://api.aboard.exchange/{chain} ； The base endpoint for WebSocket API ； wss://api.aboard.exchange/{chain} Supported Chains arbitrum Login Path: /api/v1/account/login Method: POST Description: Get apiKey and apiSecret Body: Copy Add the following fields to the header:
+├─ ABOARD-ADDRESS: String (Mandatory) (Wallet address)
+├─ ABOARD-SIGNATURE: String (Mandatory) (Signature with wallet,The signature data are as follows)
+action:
+Aboard Authentication
+onlySignOn:
+https://aboard.exchange
+timestamp:
+{millisecond timestamp}
+└─ ABOARD-TIMESTAMP: String (Mandatory) (Millisecond timestamp) Response: Copy ├─ code: Number
+├─ msg: String
+└─ data: Object
+   ├─ apiKey: String  (Temporary apikey)
+   └─ apiSecret: String  (Temporary apisecret) Example: Request: Copy https://api.aboard.exchange/arbitrum/api/v1/account/login Response： Copy {
+  "code": 0,
+  "msg": "",
+  "data": {
+    "apiKey": "xxxx",
+    "apiSecret": "xxxx"
+  }
+}
+Note: apiKey/apiSecret are valid for 4 hours; And each private endpoint request would reset the timer.
+ Endpoint Verify All private endpoint (Trades、Account、Websocket Private Information Streams) must verify signature. ENUM definitions Order status (status): NEW (new order) PARTIALLY_FILLED (partial filled) FILLED (all filled) CANCELED (canceled) Order type (orderTypes, type): LIMIT (limit order) MARKET (market order) STOP (stop loss limit order) STOP_MARKET (stop loss market order) TAKE_PROFIT (stop profit limit order) TAKE_PROFIT_MARKET (stop profit market order) TRAILING_STOP_MARKET (tracking stop loss order, not supported) POST_ONLY (maker only, not supported) Order side (side): BUY SELL Position side (positionSide): NET ( Single position direction ) LONG (under two-way position) SHORT (under two-way position) Time in force (timeInForce): GTC - Good Till Cancel IOC - Immediate or Cancel FOK - Fill or Kill GTX - Good Till Crossing PreviousAPI NextPublic Data Last updated 1 year ago On this page General API Information Login Endpoint Verify ENUM definitions

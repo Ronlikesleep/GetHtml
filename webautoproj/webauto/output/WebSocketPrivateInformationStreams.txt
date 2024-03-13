@@ -1,0 +1,193 @@
+WebSocket Private Information Streams | Aboard Docs Products The Exchange Aboard Asset Management 📖Tokenomics For Beginner Video Tutorials Asset Management Tutorials For Fund Managers For Investors Financial Terms What are Futures and Perpetual Futures? Why Indices and Index Futures Matter? Order Book and Spread Explained What are Market Makers and Market Takers? Risk Management Avoid Getting Rekt How to Hedge your ANC Principal when participating in liquidity mining on Anchor? Trading Understanding Candlestick Charts How to Read Support and Resistance Market Order vs. Limit Order: When to Use Which? For developer API General Info Public Data Trades Endpoints Account Endpoints Market Data Endpoints WebSocket Public Information Streams WebSocket Private Information Streams Signature Operation GitHub Implementation Perpetuals Futures Expected Changes in Accounts Multi-position liquidation price calculation Multi-positions bankruptcy price calculation Funding Calculation Indices Aboard DeFi-20 Index Methodology Price Feeds Fund Terms Fees Social Media Powered by GitBook Authentication Path: /private Method: WebSocket Description: Websocket private channel auth on connected Parameters: Copy ├─ op: String (auth:authentication ) 
+└─ args: Array
+   ├─ apiKey: String  (apiKey)
+   ├─ timestamp: String  (second timestamp)
+   └─ signature: String Response: Copy ├─ event: String
+├─ code: Number
+└─ msg: String Example: Request: Copy {
+  "op": "auth",
+  "args": [
+    {
+      "apiKey": "985d5b66-57ce-40fb-b714-afc0b9787083",
+      "timestamp": "1538054050000",
+      "signature": "7L+zFQ+CEgGu5rzCj4+BdV2/uUHGqddA9pI6ztsRRPs="
+    }
+  ]
+} Response: Copy {
+  "event": "auth",
+  "code": 0,
+  "msg": ""
+} Account Channel Path: /private Method: WebSocket Description: Channel to subscribe account update Parameters: Copy ├─ op: String  (Operation, subscribe unsubscribe)
+└─ args: Array
+   ├─ channel: String  (account: account)
+   └─ asset: String Response: Copy ├─ channel: String
+├─ asset: String
+└─ data: Object
+   ├─ totalWalletBalance: String  (total wallet balance, only for USDT asset)
+   ├─ totalUnrealizedProfit: String  (total unrealized profit, only for USDT asset)
+   ├─ totalMarginBalance: String  (total margin balance, only for USDT asset)
+   ├─ totalPositionMargin: String  (initial margin required for positions with current mark price, only for USDT asset)
+   ├─ totalFrozenMargin: String  (initial margin required for open orders with current mark price, only for USDT asset)
+   ├─ totalFrozenMoney: String  (total frozen money, only for USDT asset)
+   ├─ totalAvailableBalance: String  (available balance, only for USDT asset)
+   └─ assets: Array
+      ├─ asset: String
+      ├─ walletBalance: String  (wallet balance)
+      ├─ unrealizedProfit: String  (unrealized profit)
+      ├─ marginBalance: String  (margin balance)
+      ├─ positionMargin: String  (total initial margin required with current mark price)
+      ├─ frozenMargin: String  (initial margin required for open orders with current mark price)
+      ├─ frozenMoney: String  (frozen money)
+      ├─ availableBalance: String  (available balance)
+      └─ updateTime: Number Example: Request: Copy {
+  "op": "subscribe",
+  "args": [
+    {
+      "channel": "account",
+      "asset": "USDT"
+    }
+  ]
+} Response: Copy {
+  "channel": "account",
+  "asset": "USDT"
+  "data": {
+    "totalWalletBalance": "23.72469206",
+    "totalUnrealizedProfit": "0.00000000",
+    "totalMarginBalance": "23.72469206",
+    "totalPositionMargin": "0.00000000",
+    "totalFrozenMargin": "0.00000000",
+    "totalFrozenMoney": "0.00000000",
+    "totalAvailableBalance": "23.72469206",
+    "assets": [
+      {
+        "asset": "USDT",
+        "walletBalance": "23.72469206",
+        "unrealizedProfit": "0.00000000",
+        "marginBalance": "23.72469206",
+        "positionMargin": "0.00000000",
+        "frozenMargin": "0.00000000",
+        "frozenMoney": "0.00000000",
+        "availableBalance": "23.72469206",
+        "updateTime": 1625474304765
+      }
+    ]
+  }
+} Positions Channel Path: /private Method: WebSocket Description: Channel to subscribe position update Parameters: Copy ├─ op: String  (Operation, subscribe unsubscribe)
+└─ args: Array
+   ├─ channel: String  (position: positions)
+   └─ symbol: String  (only support empty string, which means to subscribe all symbols) Response: Copy ├─ channel: String
+├─ symbol: String
+└─ data: Array
+   ├─ symbol: String
+   ├─ positionSide: String
+   ├─ marginType: String  (margin mode:ISOLATED/CROSSED)
+   ├─ positionAmt: String  (Position quantity. The symbol represents the long and short direction. Positive numbers are many and negative numbers are empty)
+   ├─ availableAmt: String  (Open position quantity)
+   ├─ leverage: String
+   ├─ openPrice: String
+   ├─ unRealizedProfit: String  (Unrealized profits and losses of positions)
+   ├─ positionMargin: String  (Position margin)
+   ├─ isAutoAddMargin: String  (If increase margin when Isolated)
+   ├─ isolatedMargin: String  (Isolated margin)
+   ├─ markPrice: String  (Mark price)
+   ├─ liquidationPrice: String  (Liquidation price)
+   ├─ marginRate: String  (Margin rate)
+   └─ updateTime: Number Example: Request: Copy {
+  "op": "subscribe",
+  "args": [
+    {
+      "channel": "position",
+      "symbol": ""
+    }
+  ]
+} Response: Copy {
+  "channel": "position",
+  "symbol": "ETH-USDC"
+  "data": [
+    {
+      "symbol": "ETH-USDC",
+      "positionSide": "NET",
+      "marginType": "CROSSED",
+      "positionAmt": "-234.78",
+      "availableAmt": "200",
+      "leverage": "10",
+      "openPrice": "0.00000",
+      "unRealizedProfit": "0.00",
+      "positionMargin": "0.00",
+      "isAutoAddMargin": "false",
+      "isolatedMargin": "0.00",
+      "markPrice": "6679.50671178",
+      "liquidationPrice": "0",
+      "marginRate": "0",
+      "updateTime": 1625474304765
+    }
+  ]
+} Order Channel Path: /private Method: WebSocket Description: Channel to subscribe order status update Parameters: Copy ├─ op: String  (Operation, subscribe unsubscribe)
+└─ args: Array
+   ├─ channel: String  (order: orders)
+   └─ symbol: String Response: Copy ├─ channel: String
+├─ symbol: String
+└─ data: Array
+   ├─ symbol: String
+   ├─ side: String
+   ├─ positionSide: String
+   ├─ status: String
+   ├─ price: String
+   ├─ origQty: String  (Original quantity)
+   ├─ origType: String  (Original order type)
+   ├─ type: String  (order type)
+   ├─ timeInForce: String
+   ├─ orderId: String  (System order number)
+   ├─ clientOrderId: String  (User defined order number)
+   ├─ reduceOnly: Boolean  (if reduce position only)
+   ├─ workingType: String  (Conditional price trigger type)
+   ├─ stopPrice: String  (please ignore when order type is TRAILING_STOP_MARKET)
+   ├─ closePosition: Boolean  (if Close-All)
+   ├─ activatePrice: String  (activation price, only return with TRAILING_STOP_MARKET order)
+   ├─ priceRate: String  (callback rate, only return with TRAILING_STOP_MARKET order)
+   ├─ priceProtect: Boolean  (if conditional order trigger is protected)
+   ├─ orderTime: Number
+   ├─ cumQuote: String  (trades amount)
+   ├─ executedQty: String  (trades quantity)
+   ├─ avgPrice: String  (trades price)
+   ├─ updateTime: Number
+   └─ frozenMargin: String Example: Request: Copy {
+  "op": "subscribe",
+  "args": [
+    {
+      "channel": "order",
+      "symbol": "ETH-USDC"
+    }
+  ]
+} Response: Copy {
+  "channel": "order",
+  "symbol": "ETH-USDC"
+  "data": [
+    {
+      "symbol": "ETH-USDC",
+      "side": "BUY",
+      "positionSide": "SHORT",
+      "status": "NEW",
+      "price": "0",
+      "origQty": "0.40",
+      "origType": "TRAILING_STOP_MARKET",
+      "type": "TRAILING_STOP_MARKET",
+      "timeInForce": "GTC",
+      "orderId": "1573346959",
+      "clientOrderId": "abc",
+      "reduceOnly": false,
+      "workingType": "LAST_PRICE",
+      "stopPrice": "9300",
+      "closePosition": false,
+      "activatePrice": "9020",
+      "priceRate": "0.3",
+      "priceProtect": false,
+      "orderTime": 1579276756075,
+      "cumQuote": "0",
+      "executedQty": "0",
+      "avgPrice": "0.00000",
+      "updateTime": 1579276756075,
+      "frozenMargin": "12.34"
+    }
+  ]
+} PreviousWebSocket Public Information Streams NextSignature Operation Last updated 1 year ago On this page Authentication Account Channel Positions Channel Order Channel

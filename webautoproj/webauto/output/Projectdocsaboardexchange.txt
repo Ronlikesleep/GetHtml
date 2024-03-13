@@ -1,0 +1,849 @@
+ WebSocket Private Information Streams | Aboard Docs Products The Exchange Aboard Asset Management 📖Tokenomics For Beginner Video Tutorials Asset Management Tutorials For Fund Managers For Investors Financial Terms What are Futures and Perpetual Futures? Why Indices and Index Futures Matter? Order Book and Spread Explained What are Market Makers and Market Takers? Risk Management Avoid Getting Rekt How to Hedge your ANC Principal when participating in liquidity mining on Anchor? Trading Understanding Candlestick Charts How to Read Support and Resistance Market Order vs. Limit Order: When to Use Which? For developer API General Info Public Data Trades Endpoints Account Endpoints Market Data Endpoints WebSocket Public Information Streams WebSocket Private Information Streams Signature Operation GitHub Implementation Perpetuals Futures Expected Changes in Accounts Multi-position liquidation price calculation Multi-positions bankruptcy price calculation Funding Calculation Indices Aboard DeFi-20 Index Methodology Price Feeds Fund Terms Fees Social Media Powered by GitBook Authentication Path: /private Method: WebSocket Description: Websocket private channel auth on connected Parameters: Copy ├─ op: String (auth:authentication ) 
+└─ args: Array
+   ├─ apiKey: String  (apiKey)
+   ├─ timestamp: String  (second timestamp)
+   └─ signature: String Response: Copy ├─ event: String
+├─ code: Number
+└─ msg: String Example: Request: Copy {
+  "op": "auth",
+  "args": [
+    {
+      "apiKey": "985d5b66-57ce-40fb-b714-afc0b9787083",
+      "timestamp": "1538054050000",
+      "signature": "7L+zFQ+CEgGu5rzCj4+BdV2/uUHGqddA9pI6ztsRRPs="
+    }
+  ]
+} Response: Copy {
+  "event": "auth",
+  "code": 0,
+  "msg": ""
+} Account Channel Path: /private Method: WebSocket Description: Channel to subscribe account update Parameters: Copy ├─ op: String  (Operation, subscribe unsubscribe)
+└─ args: Array
+   ├─ channel: String  (account: account)
+   └─ asset: String Response: Copy ├─ channel: String
+├─ asset: String
+└─ data: Object
+   ├─ totalWalletBalance: String  (total wallet balance, only for USDT asset)
+   ├─ totalUnrealizedProfit: String  (total unrealized profit, only for USDT asset)
+   ├─ totalMarginBalance: String  (total margin balance, only for USDT asset)
+   ├─ totalPositionMargin: String  (initial margin required for positions with current mark price, only for USDT asset)
+   ├─ totalFrozenMargin: String  (initial margin required for open orders with current mark price, only for USDT asset)
+   ├─ totalFrozenMoney: String  (total frozen money, only for USDT asset)
+   ├─ totalAvailableBalance: String  (available balance, only for USDT asset)
+   └─ assets: Array
+      ├─ asset: String
+      ├─ walletBalance: String  (wallet balance)
+      ├─ unrealizedProfit: String  (unrealized profit)
+      ├─ marginBalance: String  (margin balance)
+      ├─ positionMargin: String  (total initial margin required with current mark price)
+      ├─ frozenMargin: String  (initial margin required for open orders with current mark price)
+      ├─ frozenMoney: String  (frozen money)
+      ├─ availableBalance: String  (available balance)
+      └─ updateTime: Number Example: Request: Copy {
+  "op": "subscribe",
+  "args": [
+    {
+      "channel": "account",
+      "asset": "USDT"
+    }
+  ]
+} Response: Copy {
+  "channel": "account",
+  "asset": "USDT"
+  "data": {
+    "totalWalletBalance": "23.72469206",
+    "totalUnrealizedProfit": "0.00000000",
+    "totalMarginBalance": "23.72469206",
+    "totalPositionMargin": "0.00000000",
+    "totalFrozenMargin": "0.00000000",
+    "totalFrozenMoney": "0.00000000",
+    "totalAvailableBalance": "23.72469206",
+    "assets": [
+      {
+        "asset": "USDT",
+        "walletBalance": "23.72469206",
+        "unrealizedProfit": "0.00000000",
+        "marginBalance": "23.72469206",
+        "positionMargin": "0.00000000",
+        "frozenMargin": "0.00000000",
+        "frozenMoney": "0.00000000",
+        "availableBalance": "23.72469206",
+        "updateTime": 1625474304765
+      }
+    ]
+  }
+} Positions Channel Path: /private Method: WebSocket Description: Channel to subscribe position update Parameters: Copy ├─ op: String  (Operation, subscribe unsubscribe)
+└─ args: Array
+   ├─ channel: String  (position: positions)
+   └─ symbol: String  (only support empty string, which means to subscribe all symbols) Response: Copy ├─ channel: String
+├─ symbol: String
+└─ data: Array
+   ├─ symbol: String
+   ├─ positionSide: String
+   ├─ marginType: String  (margin mode:ISOLATED/CROSSED)
+   ├─ positionAmt: String  (Position quantity. The symbol represents the long and short direction. Positive numbers are many and negative numbers are empty)
+   ├─ availableAmt: String  (Open position quantity)
+   ├─ leverage: String
+   ├─ openPrice: String
+   ├─ unRealizedProfit: String  (Unrealized profits and losses of positions)
+   ├─ positionMargin: String  (Position margin)
+   ├─ isAutoAddMargin: String  (If increase margin when Isolated)
+   ├─ isolatedMargin: String  (Isolated margin)
+   ├─ markPrice: String  (Mark price)
+   ├─ liquidationPrice: String  (Liquidation price)
+   ├─ marginRate: String  (Margin rate)
+   └─ updateTime: Number Example: Request: Copy {
+  "op": "subscribe",
+  "args": [
+    {
+      "channel": "position",
+      "symbol": ""
+    }
+  ]
+} Response: Copy {
+  "channel": "position",
+  "symbol": "ETH-USDC"
+  "data": [
+    {
+      "symbol": "ETH-USDC",
+      "positionSide": "NET",
+      "marginType": "CROSSED",
+      "positionAmt": "-234.78",
+      "availableAmt": "200",
+      "leverage": "10",
+      "openPrice": "0.00000",
+      "unRealizedProfit": "0.00",
+      "positionMargin": "0.00",
+      "isAutoAddMargin": "false",
+      "isolatedMargin": "0.00",
+      "markPrice": "6679.50671178",
+      "liquidationPrice": "0",
+      "marginRate": "0",
+      "updateTime": 1625474304765
+    }
+  ]
+} Order Channel Path: /private Method: WebSocket Description: Channel to subscribe order status update Parameters: Copy ├─ op: String  (Operation, subscribe unsubscribe)
+└─ args: Array
+   ├─ channel: String  (order: orders)
+   └─ symbol: String Response: Copy ├─ channel: String
+├─ symbol: String
+└─ data: Array
+   ├─ symbol: String
+   ├─ side: String
+   ├─ positionSide: String
+   ├─ status: String
+   ├─ price: String
+   ├─ origQty: String  (Original quantity)
+   ├─ origType: String  (Original order type)
+   ├─ type: String  (order type)
+   ├─ timeInForce: String
+   ├─ orderId: String  (System order number)
+   ├─ clientOrderId: String  (User defined order number)
+   ├─ reduceOnly: Boolean  (if reduce position only)
+   ├─ workingType: String  (Conditional price trigger type)
+   ├─ stopPrice: String  (please ignore when order type is TRAILING_STOP_MARKET)
+   ├─ closePosition: Boolean  (if Close-All)
+   ├─ activatePrice: String  (activation price, only return with TRAILING_STOP_MARKET order)
+   ├─ priceRate: String  (callback rate, only return with TRAILING_STOP_MARKET order)
+   ├─ priceProtect: Boolean  (if conditional order trigger is protected)
+   ├─ orderTime: Number
+   ├─ cumQuote: String  (trades amount)
+   ├─ executedQty: String  (trades quantity)
+   ├─ avgPrice: String  (trades price)
+   ├─ updateTime: Number
+   └─ frozenMargin: String Example: Request: Copy {
+  "op": "subscribe",
+  "args": [
+    {
+      "channel": "order",
+      "symbol": "ETH-USDC"
+    }
+  ]
+} Response: Copy {
+  "channel": "order",
+  "symbol": "ETH-USDC"
+  "data": [
+    {
+      "symbol": "ETH-USDC",
+      "side": "BUY",
+      "positionSide": "SHORT",
+      "status": "NEW",
+      "price": "0",
+      "origQty": "0.40",
+      "origType": "TRAILING_STOP_MARKET",
+      "type": "TRAILING_STOP_MARKET",
+      "timeInForce": "GTC",
+      "orderId": "1573346959",
+      "clientOrderId": "abc",
+      "reduceOnly": false,
+      "workingType": "LAST_PRICE",
+      "stopPrice": "9300",
+      "closePosition": false,
+      "activatePrice": "9020",
+      "priceRate": "0.3",
+      "priceProtect": false,
+      "orderTime": 1579276756075,
+      "cumQuote": "0",
+      "executedQty": "0",
+      "avgPrice": "0.00000",
+      "updateTime": 1579276756075,
+      "frozenMargin": "12.34"
+    }
+  ]
+} PreviousWebSocket Public Information Streams NextSignature Operation Last updated 1 year ago On this page Authentication Account Channel Positions Channel Order Channel
+
+
+Multi-position liquidation price calculation | Aboard Docs Products The Exchange Aboard Asset Management 📖Tokenomics For Beginner Video Tutorials Asset Management Tutorials For Fund Managers For Investors Financial Terms What are Futures and Perpetual Futures? Why Indices and Index Futures Matter? Order Book and Spread Explained What are Market Makers and Market Takers? Risk Management Avoid Getting Rekt How to Hedge your ANC Principal when participating in liquidity mining on Anchor? Trading Understanding Candlestick Charts How to Read Support and Resistance Market Order vs. Limit Order: When to Use Which? For developer API General Info Public Data Trades Endpoints Account Endpoints Market Data Endpoints WebSocket Public Information Streams WebSocket Private Information Streams Signature Operation GitHub Implementation Perpetuals Futures Expected Changes in Accounts Multi-position liquidation price calculation Multi-positions bankruptcy price calculation Funding Calculation Indices Aboard DeFi-20 Index Methodology Price Feeds Fund Terms Fees Social Media Powered by GitBook Multi-position liquidation price calculation: otTMM: Sum of maintenance margin of other contracts: otTMM =∑k=1nabs(Sk∗Pk∗Mk)−abs⁡(Si∗Pi∗Mi)\text { otTMM }=\sum_{k=1}^{n} a b s\left(S_{k} * P_{k} * M_{k}\right)-\operatorname{abs}\left(S_{i} * P_{i} * M_{i}\right) otUPNL: Total unrealized gain or loss of other contracts: otUPNL =∑k=1nSk∗(Pk−Pko)−Si∗(Pi−Pio)\text { otUPNL }=\sum_{k=1}^{n} S_{k} *\left(P_{k}-P_{k}^{o}\right)-S_{i} *\left(P_{i}-P_{i}^{o}\right) The liquidation price of the Ith  I^{\text {th}}\;contract ( PilP_i^l): Pil=Si∗Pio−BI+ otTMM - otUPNL Si∗(1−dir⁡i∗Mi)P_{i}^{l}=\frac{S_{i} * P_{i}^{o}-\mathrm{BI}+\text { otTMM - otUPNL }}{S_{i} *\left(1-\operatorname{dir}_{i} * M_{i}\right)} Variables: BIBI: Static account equity Pi:P_i:Current oracle price of the Ith  I^{\text {th}}\;contract Pil:P_i^l:The liquidation price of the Ith  I^{\text {th}}\;contract Pi0P_i^0: The opening price of the Ith  I^{\text {th}}\;contract Si:S_i: The number of open positions of the Ith  I^{\text {th}}\;contract, positive for long positions and negative for short positions. diri:dir_i: The opening direction of the Ith  I^{\text {th}}\;contract, +1 for long positions and -1 for short positions Mi:M_i:Maintenance margin rate of the Ith  I^{\text {th}}\;contract Example: Initial account balance BI=1000BI = 1000, ETH-USDC maintenance margin rate Mi=3M_i = 3%%, the opening price of ETH-USD Pi0=3000P_i^0 = 3000, Current oracle price PiP_i= 2900; BTC-USDC maintenance margin rate Mi=3M_i = 3%%, the opening price of BTC-USDC Pn0=40000P_n^0 = 40000, Current oracle price PnP_n= 38000. A trader buys SiS_i= 1.5 ETH-USDC, sells SnS_n= -0.1 BTC-USDC. The liquidation price of the ETH contracts is: otTMM = abs(−0.1∗38000∗3%)=144abs(-0.1*38000*3\%)=144 otUPNL = −0.1∗(38000−40000)=200-0.1*(38000-40000)=200 Pil=1.5∗3000−1000+114−2001.5∗(1−3%)=2346.39P_{i}^{l}=\frac{1.5 *3000 -1000+114-200}{1.5 *(1-3\%)}=2346.39 The liquidation price of the BTC contracts is: otTMM = abs(1.5∗2900∗3%)=130.5abs(1.5*2900*3\%)=130.5 otUPNL = 1.5∗(2900−3000)=−1501.5*(2900-3000)=-150 Pnl=−0.1∗40000−1000+130.5+150−0.1∗(1+3%)=45820.388P_{n}^{l}=\frac{ -0.1*40000 -1000+130.5+150}{-0.1 *(1+3\%)}=45820.388 PreviousExpected Changes in Accounts NextMulti-positions bankruptcy price calculation Last updated 2 years ago On this page Multi-position liquidation price calculation: Example:
+
+
+Market Data Endpoints | Aboard Docs Products The Exchange Aboard Asset Management 📖Tokenomics For Beginner Video Tutorials Asset Management Tutorials For Fund Managers For Investors Financial Terms What are Futures and Perpetual Futures? Why Indices and Index Futures Matter? Order Book and Spread Explained What are Market Makers and Market Takers? Risk Management Avoid Getting Rekt How to Hedge your ANC Principal when participating in liquidity mining on Anchor? Trading Understanding Candlestick Charts How to Read Support and Resistance Market Order vs. Limit Order: When to Use Which? For developer API General Info Public Data Trades Endpoints Account Endpoints Market Data Endpoints WebSocket Public Information Streams WebSocket Private Information Streams Signature Operation GitHub Implementation Perpetuals Futures Expected Changes in Accounts Multi-position liquidation price calculation Multi-positions bankruptcy price calculation Funding Calculation Indices Aboard DeFi-20 Index Methodology Price Feeds Fund Terms Fees Social Media Powered by GitBook Query All Contract Markets Path: /api/v1/market/tickers Method: GET Description: Query all contract markets data Parameters: Copy Response: Copy ├─ code: Number
+├─ msg: String
+└─ data: Array
+    ├─ symbol: String
+    ├─ priceChange: String  (24-hour price change)
+    ├─ priceChangePercent: String  (Percentage of 24-hour price change)
+    ├─ lastPrice: String  (Last trades price)
+    ├─ lastQty: String  (Last trades amount)
+    ├─ openPrice: String  (Price of the first trades within 24 hours)
+    ├─ highPrice: String  (24-hour maximum price)
+    ├─ lowPrice: String  (24-hour lowest price)
+    ├─ volume: String  (24-hour trades quantity)
+    ├─ quoteVolume: String  (24-hour trades amount)
+    └─ count: Number  (24-hour trades count) Example: Request: Copy https://api.aboard.exchange/arbitrum/api/v1/market/tickers Response: Copy {
+  "code": 0,
+  "msg": "",
+  "data": [
+    {
+      "symbol": "ETH-USDC",
+      "priceChange": "-94.99999800",
+      "priceChangePercent": "-95.960",
+      "lastPrice": "4.00000200",
+      "lastQty": "200.00000000",
+      "openPrice": "99.00000000",
+      "highPrice": "100.00000000",
+      "lowPrice": "0.10000000",
+      "volume": "8913.30000000",
+      "quoteVolume": "15.30000000",
+      "count": 76
+    }
+  ]
+} Query Contract Market Path: /api/v1/market/ticker Method: GET Description: Query contract market by symbol Parameters: Copy └─ symbol: String (Mandatory) Response: Copy ├─ code: Number
+├─ msg: String
+└─ data: Object
+   ├─ symbol: String
+   ├─ priceChange: String  (24-hour price change)
+   ├─ priceChangePercent: String  (Percentage of 24-hour price change)
+   ├─ lastPrice: String  (Last trades price)
+   ├─ lastQty: String  (Last trades amount)
+   ├─ openPrice: String  (Price of the first trades within 24 hours)
+   ├─ highPrice: String  (24-hour maximum price)
+   ├─ lowPrice: String  (24-hour lowest price)
+   ├─ volume: String  (24-hour trades quantity)
+   ├─ quoteVolume: String  (24-hour trades amount)
+   └─ count: Number  (24-hour trades count) Example: Request: Copy https://api.aboard.exchange/arbitrum/api/v1/market/tickers?symbol=ETH-USDC Response: Copy {
+  "code": 0,
+  "msg": "",
+  "data": {
+    "symbol": "ETH-USDC",
+    "priceChange": "-94.99999800",
+    "priceChangePercent": "-95.960",
+    "lastPrice": "4.00000200",
+    "lastQty": "200.00000000",
+    "openPrice": "99.00000000",
+    "highPrice": "100.00000000",
+    "lowPrice": "0.10000000",
+    "volume": "8913.30000000",
+    "quoteVolume": "15.30000000",
+    "count": 76
+  }
+} Order Book Path: /api/v1/market/depth Method: GET Description: Query order book Parameters: Copy ├─ symbol: String (Mandatory)
+└─ limit: Number  (Default 20; Valid limits:[5, 10, 20, 50, 100]) Response: Copy ├─ code: Number
+├─ msg: String
+└─ data: Object
+   ├─ bids: Array (Buy)
+   │  ├─ 0: String  (price, 1st bit of array)
+   │  └─ 1: String  (quantity, 2nd bit of array)
+   ├─ asks: Array (Sell)
+   │  ├─ 0: String  (price, 1st bit of array)
+   │  └─ 1: String  (quantity, 2nd bit of array)
+   └─ time: Number Example: Request: Copy https://api.aboard.exchange/arbitrum/api/v1/market/depth?symbol=ETH-USDC&limit=1 Response: Copy {
+  "code": 0,
+  "msg": "",
+  "data": {
+    "bids": [
+      {
+        "0": "4.00000000",
+        "1": "431.00000000"
+      }
+    ],
+    "asks": [
+      {
+        "0": "4.00000200",
+        "1": "12.00000000"
+      }
+    ],
+    "time": 1569514978020
+  }
+} Query Latest Trades Path: /api/v1/market/trades Method: GET Description: Query latest trades Parameters: Copy ├─ symbol: String (Mandatory)
+└─ limit: Number  (Default 100, maximum 500) Response: Copy ├─ code: Number
+├─ msg: String
+└─ data: Array
+   ├─ id: String  (trades id)
+   ├─ price: String  (trades price)
+   ├─ qty: String  (trades quantity)
+   ├─ time: Number
+   ├─ side: String
+   └─ maker: Boolean  (if maker) Example: Request: Copy https://api.aboard.exchange/arbitrum/api/v1/market/trades?symbol=ETH-USDC&limit=1 Response: Copy {
+  "code": 0,
+  "msg": "",
+  "data": [
+    {
+      "id": "28457",
+      "price": "4.00000100",
+      "qty": "12.00000000",
+      "time": 1499865549590,
+      "side": "SELL",
+      "maker": false
+    }
+  ]
+} Kline Path: /api/v1/market/klines Method: GET Description: Get kline data Parameters: Copy ├─ symbol: String (Mandatory)
+├─ interval: String (Mandatory) (time interval: kline1m,kline5m,kline15m,kline30m,kline1h,kline4h,kline1d)
+├─ startTime: Number
+├─ endTime: Number
+└─ limit: Number  (Number of result sets returned, default:100 maximum:500) Response: Copy ├─ code: Number
+├─ msg: String
+└─ data: Array
+   ├─ 0: Number  (Open time)
+   ├─ 1: String  (Open)
+   ├─ 2: String  (Hign)
+   ├─ 3: String  (Low)
+   ├─ 4: String  (Close (or latest price))
+   ├─ 5: String  (Trades quantity)
+   ├─ 6: String  (Trades amount)
+   └─ 7: Number  (Trades count) Example: Request: Copy https://api.aboard.exchange/arbitrum/api/v1/market/klines?symbol=ETH-USDC&interval=15m&startTime=1628575642000&endTime=1628585642000&limit=100 Response: Copy {
+  "code": 0,
+  "msg": "",
+  "data": [
+    {
+      "0": 1499040000000,
+      "1": "0.01634790",
+      "2": "0.80000000",
+      "3": "0.01575800",
+      "4": "0.01577100",
+      "5": "148976.11427815",
+      "6": "2434.19055334",
+      "7": 308
+    }
+  ]
+} PreviousAccount Endpoints NextWebSocket Public Information Streams Last updated 1 year ago On this page Query All Contract Markets Query Contract Market Order Book Query Latest Trades Kline
+
+
+GitHub | Aboard Docs Products The Exchange Aboard Asset Management 📖Tokenomics For Beginner Video Tutorials Asset Management Tutorials For Fund Managers For Investors Financial Terms What are Futures and Perpetual Futures? Why Indices and Index Futures Matter? Order Book and Spread Explained What are Market Makers and Market Takers? Risk Management Avoid Getting Rekt How to Hedge your ANC Principal when participating in liquidity mining on Anchor? Trading Understanding Candlestick Charts How to Read Support and Resistance Market Order vs. Limit Order: When to Use Which? For developer API General Info Public Data Trades Endpoints Account Endpoints Market Data Endpoints WebSocket Public Information Streams WebSocket Private Information Streams Signature Operation GitHub Implementation Perpetuals Futures Expected Changes in Accounts Multi-position liquidation price calculation Multi-positions bankruptcy price calculation Funding Calculation Indices Aboard DeFi-20 Index Methodology Price Feeds Fund Terms Fees Social Media Powered by GitBook Aboard's GitHub: https://github.com/aboard-exchange Good to know: depending on the product you're building, it can be useful to explicitly document use cases. Got a product that can be used by a bunch of people in different ways? Maybe consider splitting it out! PreviousSignature Operation NextPerpetuals Futures Last updated 2 years ago On this page
+
+
+General Info | Aboard Docs Products The Exchange Aboard Asset Management 📖Tokenomics For Beginner Video Tutorials Asset Management Tutorials For Fund Managers For Investors Financial Terms What are Futures and Perpetual Futures? Why Indices and Index Futures Matter? Order Book and Spread Explained What are Market Makers and Market Takers? Risk Management Avoid Getting Rekt How to Hedge your ANC Principal when participating in liquidity mining on Anchor? Trading Understanding Candlestick Charts How to Read Support and Resistance Market Order vs. Limit Order: When to Use Which? For developer API General Info Public Data Trades Endpoints Account Endpoints Market Data Endpoints WebSocket Public Information Streams WebSocket Private Information Streams Signature Operation GitHub Implementation Perpetuals Futures Expected Changes in Accounts Multi-position liquidation price calculation Multi-positions bankruptcy price calculation Funding Calculation Indices Aboard DeFi-20 Index Methodology Price Feeds Fund Terms Fees Social Media Powered by GitBook General API Information The base endpoint for REST API ； https://api.aboard.exchange/{chain} ； The base endpoint for WebSocket API ； wss://api.aboard.exchange/{chain} Supported Chains arbitrum Login Path: /api/v1/account/login Method: POST Description: Get apiKey and apiSecret Body: Copy Add the following fields to the header:
+├─ ABOARD-ADDRESS: String (Mandatory) (Wallet address)
+├─ ABOARD-SIGNATURE: String (Mandatory) (Signature with wallet,The signature data are as follows)
+action:
+Aboard Authentication
+onlySignOn:
+https://aboard.exchange
+timestamp:
+{millisecond timestamp}
+└─ ABOARD-TIMESTAMP: String (Mandatory) (Millisecond timestamp) Response: Copy ├─ code: Number
+├─ msg: String
+└─ data: Object
+   ├─ apiKey: String  (Temporary apikey)
+   └─ apiSecret: String  (Temporary apisecret) Example: Request: Copy https://api.aboard.exchange/arbitrum/api/v1/account/login Response： Copy {
+  "code": 0,
+  "msg": "",
+  "data": {
+    "apiKey": "xxxx",
+    "apiSecret": "xxxx"
+  }
+}
+Note: apiKey/apiSecret are valid for 4 hours; And each private endpoint request would reset the timer.
+ Endpoint Verify All private endpoint (Trades、Account、Websocket Private Information Streams) must verify signature. ENUM definitions Order status (status): NEW (new order) PARTIALLY_FILLED (partial filled) FILLED (all filled) CANCELED (canceled) Order type (orderTypes, type): LIMIT (limit order) MARKET (market order) STOP (stop loss limit order) STOP_MARKET (stop loss market order) TAKE_PROFIT (stop profit limit order) TAKE_PROFIT_MARKET (stop profit market order) TRAILING_STOP_MARKET (tracking stop loss order, not supported) POST_ONLY (maker only, not supported) Order side (side): BUY SELL Position side (positionSide): NET ( Single position direction ) LONG (under two-way position) SHORT (under two-way position) Time in force (timeInForce): GTC - Good Till Cancel IOC - Immediate or Cancel FOK - Fill or Kill GTX - Good Till Crossing PreviousAPI NextPublic Data Last updated 1 year ago On this page General API Information Login Endpoint Verify ENUM definitions
+
+
+Account Endpoints | Aboard Docs Products The Exchange Aboard Asset Management 📖Tokenomics For Beginner Video Tutorials Asset Management Tutorials For Fund Managers For Investors Financial Terms What are Futures and Perpetual Futures? Why Indices and Index Futures Matter? Order Book and Spread Explained What are Market Makers and Market Takers? Risk Management Avoid Getting Rekt How to Hedge your ANC Principal when participating in liquidity mining on Anchor? Trading Understanding Candlestick Charts How to Read Support and Resistance Market Order vs. Limit Order: When to Use Which? For developer API General Info Public Data Trades Endpoints Account Endpoints Market Data Endpoints WebSocket Public Information Streams WebSocket Private Information Streams Signature Operation GitHub Implementation Perpetuals Futures Expected Changes in Accounts Multi-position liquidation price calculation Multi-positions bankruptcy price calculation Funding Calculation Indices Aboard DeFi-20 Index Methodology Price Feeds Fund Terms Fees Social Media Powered by GitBook Account Information Path: /api/v1/account/balance Method: GET Description: Query account information Parameters: Copy Response: Copy ├─ code: Number
+├─ msg: String
+└─ data: Object
+   ├─ totalWalletBalance: String  (total wallet balance, only for USDT asset)
+   ├─ totalUnrealizedProfit: String  (total unrealized profit, only for USDT asset)
+   ├─ totalMarginBalance: String  (total margin balance, only for USDT asset)
+   ├─ totalPositionMargin: String  (initial margin required for positions with current mark price, only for USDT asset)
+   ├─ totalFrozenMargin: String  (initial margin required for open orders with current mark price, only for USDT asset)
+   ├─ totalFrozenMoney: String  (total frozen money, only for USDT asset)
+   ├─ totalAvailableBalance: String  (available balance, only for USDT asset)
+   └─ assets: Array
+      ├─ asset: String
+      ├─ walletBalance: String  (wallet balance)
+      ├─ unrealizedProfit: String  (unrealized profit)
+      ├─ marginBalance: String  (margin balance)
+      ├─ positionMargin: String  (total initial margin required with current mark price)
+      ├─ frozenMargin: String  (initial margin required for open orders with current mark price)
+      ├─ frozenMoney: String  (frozen money)
+      ├─ availableBalance: String  (available balance)
+      └─ updateTime: Number Example: Request: Copy https://api.aboard.exchange/arbitrum/api/v1/account/balance Response: Copy {
+  "code": 0,
+  "msg": "",
+  "data": {
+    "totalWalletBalance": "23.72469206",
+    "totalUnrealizedProfit": "0.00000000",
+    "totalMarginBalance": "23.72469206",
+    "totalPositionMargin": "0.00000000",
+    "totalFrozenMargin": "0.00000000",
+    "totalFrozenMoney": "0.00000000",
+    "totalAvailableBalance": "23.72469206",
+    "assets": [
+      {
+        "asset": "USDT",
+        "walletBalance": "23.72469206",
+        "unrealizedProfit": "0.00000000",
+        "marginBalance": "23.72469206",
+        "positionMargin": "0.00000000",
+        "frozenMargin": "0.00000000",
+        "frozenMoney": "0.00000000",
+        "availableBalance": "23.72469206",
+        "updateTime": 1625474304765
+      }
+    ]
+  }
+} Query Position Path: /api/v1/account/positions Method: GET Description: Query position Parameters: Copy └─ symbol: String Response: Copy ├─ code: Number
+├─ msg: String
+└─ data: Array
+   ├─ symbol: String
+   ├─ positionSide: String
+   ├─ marginType: String  (margin mode:ISOLATED/CROSSED)
+   ├─ positionAmt: String  (Position quantity. The symbol represents the long and short direction. Positive numbers are many and negative numbers are empty)
+   ├─ availableAmt: String  (Open position quantity)
+   ├─ leverage: String
+   ├─ openPrice: String
+   ├─ unRealizedProfit: String  (Unrealized profits and losses of positions)
+   ├─ positionMargin: String  (Position margin)
+   ├─ isAutoAddMargin: String  (If increase margin when Isolated)
+   ├─ isolatedMargin: String  (Isolated margin)
+   ├─ markPrice: String  (Mark price)
+   ├─ liquidationPrice: String  (Liquidation price)
+   ├─ marginRate: String  (Margin rate)
+   └─ updateTime: Number Example: Request: Copy https://api.aboard.exchange/arbitrum/api/v1/account/positions?symbol=ETH-USDC Response: Copy {
+  "code": 0,
+  "msg": "",
+  "data": [
+    {
+      "symbol": "ETH-USDC",
+      "positionSide": "NET",
+      "marginType": "CROSSED",
+      "positionAmt": "-234.78",
+      "availableAmt": "200",
+      "leverage": "10",
+      "openPrice": "0.00000",
+      "unRealizedProfit": "0.00",
+      "positionMargin": "0.00",
+      "isAutoAddMargin": "false",
+      "isolatedMargin": "0.00",
+      "markPrice": "6679.50671178",
+      "liquidationPrice": "0",
+      "marginRate": "0",
+      "updateTime": 1625474304765
+    }
+  ]
+} Get Income History Path: /api/v1/account/bills Method: GET Description: Get income history Parameters: Copy ├─ symbol: String
+├─ billType: String (DEPOSIT, WITHDRAW, REALIZED_PNL，FUNDING_FEE, COMMISSION, LIQUIDATION)
+├─ startTime: Number
+├─ endTime: Number
+└─ limit: Number (Number of result sets returned, default:100 maximum:500) Response: Copy ├─ code: Number
+├─ msg: String
+└─ data: Array
+   ├─ symbol: String  (trade symbol, if existing)
+   ├─ billType: String  (income type)
+   ├─ amount: String  (income amount)
+   ├─ asset: String  (income asset)
+   ├─ info: String  (extra information)
+   ├─ insertTime: Number
+   └─ id: String  (trade id) Example: Request: Copy https://api.aboard.exchange/arbitrum/api/v1/account/bills?symbol=ETH-USDC&billType=REALIZED_PNL&startTime=1628575642000&endTime=1628585642000&limit=100 Response: Copy {
+  "code": 0,
+  "msg": "",
+  "data": [
+    {
+      "symbol": "ETH-USDC",
+      "billType": "REALIZED_PNL",
+      "amount": "-0.37500000",
+      "asset": "USDT",
+      "info": "REALIZED_PNL",
+      "insertTime": 1570608000000,
+      "id": "9689322392"
+    }
+  ]
+} User Commission Rate Path: /api/v1/account/commissionRate Method: GET Description: Query user commission rate Parameters: Copy └─ symbol: String Response: Copy ├─ code: Number
+├─ msg: String
+└─ data: Object
+   ├─ symbol: String
+   ├─ makerCommissionRate: String  (maker commission rate)
+   └─ takerCommissionRate: String  (taker commission rate) Example: Request: Copy https://api.aboard.exchange/arbitrum/api/v1/account/commissionRate?symbol=ETH-USDC Response: Copy {
+  "code": 0,
+  "msg": "",
+  "data": {
+    "symbol": "",
+    "makerCommissionRate": "0.0002",
+    "takerCommissionRate": "0.0004",
+    "withdrawFee": "5"
+  }
+} Deposit Web3 interaction. Refer to SDK. Withdraw Copy - Path: /api/v1/account/withdraw
+- Method: POST
+- Description: Withdraw
+- Body:
+    ├─ asset: String (Mandatory)
+    ├─ amount: Number (Mandatory)
+    └─ destination: String (Mandatory)  (Must be the same address with your account. ) Requests Web3 contract function params. Response: Copy ├─ code: Number
+├─ msg: String
+└─ data: Object  # Web3 contract function params
+    ├─withdrawId: String
+    ├─expiringTimestamp: Number
+    └─signature: String
+        ├─ r: String
+        ├─ s: String
+        └─ v: String Example: Copy Request:
+```
+{
+  "asset": "USDC",
+  "amount": "1000",
+  "destination": "0x2222..."
+}
+```
+
+Response:
+
+```
+{
+    'code': 0,
+    'msg': '',
+    'data': {
+        'withdrawId': '50211378',
+        'signature': {
+            'r': '0x32951xxxx',
+            's': '0x662e7xxxx',
+            'v': '0x1c'},
+        'expiringTimestamp': 1672718184}
+}
+``` Then call the Web3 contract function to withdraw. Please refer to the method in SDK. PreviousTrades Endpoints NextMarket Data Endpoints Last updated 1 year ago On this page Account Information Query Position Get Income History User Commission Rate Deposit Withdraw
+
+
+Indices | Aboard Docs Products The Exchange Aboard Asset Management 📖Tokenomics For Beginner Video Tutorials Asset Management Tutorials For Fund Managers For Investors Financial Terms What are Futures and Perpetual Futures? Why Indices and Index Futures Matter? Order Book and Spread Explained What are Market Makers and Market Takers? Risk Management Avoid Getting Rekt How to Hedge your ANC Principal when participating in liquidity mining on Anchor? Trading Understanding Candlestick Charts How to Read Support and Resistance Market Order vs. Limit Order: When to Use Which? For developer API General Info Public Data Trades Endpoints Account Endpoints Market Data Endpoints WebSocket Public Information Streams WebSocket Private Information Streams Signature Operation GitHub Implementation Perpetuals Futures Expected Changes in Accounts Multi-position liquidation price calculation Multi-positions bankruptcy price calculation Funding Calculation Indices Aboard DeFi-20 Index Methodology Price Feeds Fund Terms Fees Social Media Powered by GitBook Initial Contract Amount: The initial contract amount is set to 1000. Index Calculation Formula: Indext=∑i=1mtPi∗NitDivisort∗Indexinitial (t≥1)Index_{t}=\frac{\sum_{i=1}^{m^t}P_{i}*N_{i}^t}{Divisor_{t}}*Index_{initial}\ \ (t\ge1) Divisort=Divisort−1∗∑i=1mPi∗Nit∑k=1gPk∗Nkt−1Divisor_{t}=Divisor_{t-1}*\frac{\sum_{i=1}^{m}P_{i}*N_{i}^t}{\sum_{k=1}^{g}P_{k}*N_{k}^{t-1}} where: IndextIndex_{t}: Index of the ttht^{th}period PiP_{i}: The current price of the ithi^{th}constituent NitN_{i}^t: At time tt, the amount of the ithi^{th}constituent in the index IndexinitialIndex_{initial}: Initial contract amount of the index, IndexinitialIndex_{initial}= 10000 Divisort:Divisor_{t}:A stabilizer that ensures a stable and continuous change of the index and eliminates the impact of index rebalancing. Divisor1=IndexinitialDivisor_{1}=Index_{initial} Index Calculation Process: Set the initial index contract amount to 1000; Determine the index constituents; Determine the amount of each constituent such that: ∑i=1mPi∗Ni=Indexinitial\sum_{i=1}^mP_{i}*N_{i}=Index_{initial} Since the price of each token PiP_{i} is already known, we need to determine the weight of each token WiW_{i} to calculate NiN_{i}: Indexinitial∗Wi=Pi∗NiIndex_{initial}*W_{i}=P{i}*N{i}. There are various methods to determine WiW_{i} Equal weights: 1m\frac{1}{m} Market cap weighted: wi=MarketValuei∑MarketValuew_{i}=\frac{MarketValue_{i}}{\sum MarketValue} and more. A Market Cap Weighted Example Initial Contract Amount: 1000. Constituent Market Cap Sqrt Market Cap Current Price BTC 884,619,116,312 940542.0 46633.22 ETH 445,105,069,241 667162.0 3805.21 BNB 87,541,528,702 295874.2 535.24 SOL 46,972,431,831 216731.2 155.67 MATIC 12,623,182,765 112353.0 1.81 wi=MarketValuei∑MarketValuew_{i}=\frac{\sqrt{MarketValue_{i}} }{\sum MarketValue} BTC: w1=940542940542+667162+295874.2+216731.2+112353=9405422232662.4=0.4213w_{1}=\frac{940542}{940542+667162+295874.2+216731.2+112353}=\frac{940542}{2232662.4}=0.4213 N11=1000∗w1p1=1000∗0.421346633.22=0.00903N_1^1=\frac{1000*w_1}{p_1}=\frac{1000*0.4213}{46633.22}=0.00903 ETH: w2=6671622232662.4=0.2988w_{2}=\frac{667162}{2232662.4}=0.2988 N21=1000∗w2p2=1000∗0.29883805.21=0.07852N_2^1=\frac{1000*w_2}{p_2}=\frac{1000*0.2988}{3805.21}=0.07852 BNB: w3=6671622232662.4=0.1325w_{3}=\frac{667162}{2232662.4}=0.1325 N31=1000∗w3p3=1000∗0.1325535.24=0.24755N_3^1=\frac{1000*w_3}{p_3}=\frac{1000*0.1325}{535.24}=0.24755 SOL: w4=216731.22232662.4=0.0971w_{4}=\frac{216731.2}{2232662.4}=0.0971 N41=1000∗w4p4=1000∗0.0971155.67=0.62375N_4^1=\frac{1000*w_4}{p_4}=\frac{1000*0.0971}{155.67}=0.62375 MATIC: w5=1123532232662.4=0.0503w_{5}=\frac{112353}{2232662.4}=0.0503 N51=1000∗w5p5=1000∗0.05031.81=27.79006N_5^1=\frac{1000*w_5}{p_5}=\frac{1000*0.0503}{1.81}=27.79006 Constituent Market Cap Sqrt Market Cap Current Price Weight Quantity BTC 884,619,116,312 940542.0 46633.22 0.4213 0.00903 ETH 445,105,069,241 667162.0 3805.21 0.2988 0.07852 BNB 87,541,528,702 295874.2 535.24 0.1325 0.24755 SOL 46,972,431,831 216731.2 155.67 0.0971 0.62376 MATIC 12,623,182,765 112353.0 1.81 0.0503 27.7901 Index Calculation: Index1=0.00903∗BTC+0.07852∗ETH+0.24755∗BNB+0.62376∗SOL+27.7901∗MATICIndex_{1}=0.00903*BTC+0.07852*ETH+0.24755*BNB+0.62376*SOL+27.7901*MATIC PreviousFunding Calculation NextAboard DeFi-20 Index Methodology Last updated 2 years ago On this page Initial Contract Amount: Index Calculation Formula: Index Calculation Process: A Market Cap Weighted Example
+
+
+For Investors | Aboard Docs Products The Exchange Aboard Asset Management 📖Tokenomics For Beginner Video Tutorials Asset Management Tutorials For Fund Managers For Investors Financial Terms What are Futures and Perpetual Futures? Why Indices and Index Futures Matter? Order Book and Spread Explained What are Market Makers and Market Takers? Risk Management Avoid Getting Rekt How to Hedge your ANC Principal when participating in liquidity mining on Anchor? Trading Understanding Candlestick Charts How to Read Support and Resistance Market Order vs. Limit Order: When to Use Which? For developer API General Info Public Data Trades Endpoints Account Endpoints Market Data Endpoints WebSocket Public Information Streams WebSocket Private Information Streams Signature Operation GitHub Implementation Perpetuals Futures Expected Changes in Accounts Multi-position liquidation price calculation Multi-positions bankruptcy price calculation Funding Calculation Indices Aboard DeFi-20 Index Methodology Price Feeds Fund Terms Fees Social Media Powered by GitBook Select Funds You can see all the live funds on the asset management page and rank them based on different criteria. Criteria Details Managed Total Assets Under Management 1D Portfolio return of the past 24 hours 1W Portfolio return of the past week 1M Portfolio return of the past month Total Total portfolio return Score The fund score depends on return, volatility, and average daily AUM of the past 30 days. Check the implementation page for more details. Risk The risk factor depends on the stop-loss line. A lower stop-loss percentage means higher risk. Check the implementation page for more details. Volume Trading volume in the past 30 days. Every fund page displays the essential information for better investment decisions. Buy a Fund To buy a fund, you first need to deposit some USDC to your fund account, which is separate from your perpetual trading account. Alternatively, you can transfer funds from your perpetual account to the funds account. You may access either function in the top-right corner. Currently, Aboard only support USDC for the asset management system. After depositing USDC, you can buy funds on the dedicated fund page. Monitor your Shares After purchasing, you can see how your funds perform via the fund page or your fund dashboard on the asset management page.. Sell your Shares You can always sell your shares via the Fund or Personal Dashboards. Your funds are subject to different lock-up periods depending on the fund terms and purchase time. You can schedule the earliest date you'd like to get your funds back. You are still exposed to the fund's performance (subject to win or loss) until the final delivery date. PreviousFor Fund Managers NextFinancial Terms Last updated 10 months ago On this page Select Funds Buy a Fund Monitor your Shares Sell your Shares The fund page Personal Dashboard
+
+
+Risk Management | Aboard Docs Products The Exchange Aboard Asset Management 📖Tokenomics For Beginner Video Tutorials Asset Management Tutorials For Fund Managers For Investors Financial Terms What are Futures and Perpetual Futures? Why Indices and Index Futures Matter? Order Book and Spread Explained What are Market Makers and Market Takers? Risk Management Avoid Getting Rekt How to Hedge your ANC Principal when participating in liquidity mining on Anchor? Trading Understanding Candlestick Charts How to Read Support and Resistance Market Order vs. Limit Order: When to Use Which? For developer API General Info Public Data Trades Endpoints Account Endpoints Market Data Endpoints WebSocket Public Information Streams WebSocket Private Information Streams Signature Operation GitHub Implementation Perpetuals Futures Expected Changes in Accounts Multi-position liquidation price calculation Multi-positions bankruptcy price calculation Funding Calculation Indices Aboard DeFi-20 Index Methodology Price Feeds Fund Terms Fees Social Media Powered by GitBook Avoid Getting Rekt How to Hedge your ANC Principal when participating in liquidity mining on Anchor? PreviousFinancial Terms NextTrading Last updated 2 years ago On this page
+
+
+WebSocket Public Information Streams | Aboard Docs Products The Exchange Aboard Asset Management 📖Tokenomics For Beginner Video Tutorials Asset Management Tutorials For Fund Managers For Investors Financial Terms What are Futures and Perpetual Futures? Why Indices and Index Futures Matter? Order Book and Spread Explained What are Market Makers and Market Takers? Risk Management Avoid Getting Rekt How to Hedge your ANC Principal when participating in liquidity mining on Anchor? Trading Understanding Candlestick Charts How to Read Support and Resistance Market Order vs. Limit Order: When to Use Which? For developer API General Info Public Data Trades Endpoints Account Endpoints Market Data Endpoints WebSocket Public Information Streams WebSocket Private Information Streams Signature Operation GitHub Implementation Perpetuals Futures Expected Changes in Accounts Multi-position liquidation price calculation Multi-positions bankruptcy price calculation Funding Calculation Indices Aboard DeFi-20 Index Methodology Price Feeds Fund Terms Fees Social Media Powered by GitBook WebSocket Format Path: /public Method: WebSocket Description: WebSocket format Parameters: Copy ├─ op: String  (Operation, subscribe unsubscribe)
+└─ args: Array (List of subscribed channels)
+   ├─ channel: String
+   └─ symbol: String Response: Copy ├─ event: String  (subscribe, unsubscribe)
+├─ channel: String
+├─ symbol: String
+├─ code: Number
+└─ msg: String Example: Request: Copy {
+  "op": "",
+  "args": [
+    {
+      "channel": "",
+      "symbol": ""
+    }
+  ]
+} Response: Copy {
+  "event": "",
+  "channel": "",
+  "symbol": ""
+  "code": 0,
+  "msg": ""
+} WebSocket Connect Path: /public Method: WebSocket Description: When the user's websocket client connects to the websocket server, the server will send a 'ping' message to it regularly (currently set to 10 seconds). When the user's websocket client receives this heartbeat message, it should return a 'pong' message. When the websocket server sends 'ping' messages for three consecutive times but does not receive any 'pong' messages, the server will actively disconnect from this client. When the websocket client does not receive the 'ping' message from the server for more than 30 seconds, it is considered that it is disconnected from the server and needs to be reconnected. Parameters: Copy └─ ping Response: Copy └─ pong All Contracts Simplify Tickers Channel Path: /public Method: WebSocket Description: Websocket channel to subscribe simplify ticker of all contracts Parameters: Copy ├─ op: String  (Operation, subscribe unsubscribe)
+└─ args: Array (List of subscribed channels)
+   └─ channel: String  (tickers: All contracts tickers) Response: Copy ├─ channel: String
+└─ data: Array
+   ├─ symbol: String
+   ├─ lastPrice: String
+   └─ priceChangePercent: String  (Percentage of 24-hour price change) Example: Request: Copy {
+  "op": "subscribe",
+  "args": [
+    {
+      "channel": "tickers"
+    }
+  ]
+} Response: Copy {
+  "channel": "tickers"
+  "data": [
+    {
+      "symbol": "ETH-USDC",
+      "lastPrice": "4.00000200",
+      "priceChangePercent": "-95.960"
+    }
+  ]
+} Single Contract Ticker Channel Path: /public Method: WebSocket Description: Websocket channel to subscribe ticker Parameters: Copy ├─ op: String  (Operation, subscribe unsubscribe)
+└─ args: Array
+   ├─ channel: String  (ticker: Single Contract Ticker)
+   └─ symbol: String Response: Copy ├─ channel: String
+├─ symbol: String
+└─ data: Object
+   ├─ symbol: String
+   ├─ priceChange: String  (24-hour price change)
+   ├─ priceChangePercent: String  (Percentage of 24-hour price change)
+   ├─ lastPrice: String  (Last trades price)
+   ├─ lastQty: String  (Last trades amount)
+   ├─ openPrice: String  (Price of the first trades within 24 hours)
+   ├─ highPrice: String  (24-hour maximum price)
+   ├─ lowPrice: String  (24-hour lowest price)
+   ├─ volume: String  (24-hour trades quantity)
+   ├─ quoteVolume: String  (24-hour trades amount)
+   └─ count: Number  (24-hour trades count) Example: Request: Copy {
+  "op": "subscribe",
+  "args": [
+    {
+      "channel": "ticker",
+      "symbol": "ETH-USDC"
+    }
+  ]
+} Response: Copy {
+  "channel": "ticker",
+  "symbol": "ETH-USDC"
+  "data": {
+    "symbol": "ETH-USDC",
+    "priceChange": "-94.99999800",
+    "priceChangePercent": "-95.960",
+    "lastPrice": "4.00000200",
+    "lastQty": "200.00000000",
+    "openPrice": "99.00000000",
+    "highPrice": "100.00000000",
+    "lowPrice": "0.10000000",
+    "volume": "8913.30000000",
+    "quoteVolume": "15.30000000",
+    "count": 76
+  }
+} Order Book Channel Path: /public Method: WebSocket Description: Channel to subscribe order book update Parameters: Copy ├─ op: String  (Operation, subscribe unsubscribe)
+└─ args: Array (List of subscribed channels)
+   ├─ channel: String  (depth<levels>: levels mean depth levels, Optional 5/10/20; depth5 for 5 depth levels)
+   └─ symbol: String Response: Copy ├─ channel: String
+├─ symbol: String
+├─ action: String  (Push data action, incremental data or full snapshot. snapshot: full update: incremental)
+└─ data: Object
+   ├─ bids: Array (Buy)
+   │  ├─ 0: String  (price, 1st bit of array)
+   │  └─ 1: String  (quantity, 2nd bit of array)
+   ├─ asks: Array (Sell)
+   │  ├─ 0: String  (price, 1st bit of array)
+   │  └─ 1: String  (quantity, 2nd bit of array)
+   └─ time: Number Example: Request: Copy {
+  "op": "subscribe",
+  "args": [
+    {
+      "channel": "depth<levels>",
+      "symbol": "ETH-USDC"
+    }
+  ]
+} Response: Copy {
+  "channel": "depth5",
+  "symbol": "ETH-USDC"
+  "action": "snapshot",
+  "data": {
+    "bids": [
+      {
+        "0": "4.00000000",
+        "1": "431.00000000"
+      }
+    ],
+    "asks": [
+      {
+        "0": "4.00000200",
+        "1": "12.00000000"
+      }
+    ],
+    "time": 1569514978020
+  }
+} Latest Trades Channel Path: /public Method: WebSocket Description: Channel to subscribe latest trades update Parameters: Copy ├─ op: String  (Operation, subscribe unsubscribe)
+└─ args: Array
+    ├─ channel: String (trade:trades) 
+    └─ symbol: String Response: Copy ├─ channel: String
+├─ symbol: String
+└─ data: Object
+   ├─ symbol: String
+   ├─ id: String  (Trades id)
+   ├─ price: String  (Trades price)
+   ├─ qty: String  (Trades quantity)
+   ├─ time: Number  (Trades time)
+   ├─ side: String
+   └─ maker: Boolean  (if maker) Example: Request: Copy {
+  "op": "subscribe",
+  "args": [
+    {
+      "channel": "trade",
+      "symbol": "ETH-USDC"
+    }
+  ]
+} Response: Copy {
+  "channel": "trade",
+  "symbol": "ETH-USDC"
+  "data": {
+    "symbol": "ETH-USDC",
+    "id": "28457",
+    "price": "4.00000100",
+    "qty": "12.00000000",
+    "time": 1499865549590,
+    "side": "SELL",
+    "maker": false
+  }
+} Kline Channel Path: /public Method: WebSocket Description: Channel to subscribe kline update Parameters: Copy ├─ op: String  (Operation, subscribe unsubscribe)
+└─ args: Array
+   ├─ channel: String  (channel: kline1m,kline5m,kline15m,kline30m,kline1h,kline4h,kline1d)
+   └─ symbol: String Response: Copy ├─ channel: String
+├─ symbol: String
+└─ data: Object
+   ├─ 0: Number  (Start time)
+   ├─ 1: String  (Open price)
+   ├─ 2: String  (highest price)
+   ├─ 3: String  (Lowest price)
+   ├─ 4: String  (Close price)
+   ├─ 5: String  (Trades quantity)
+   ├─ 6: String  (Trades amount)
+   └─ 7: Number  (Trades count) Example: Request: Copy {
+  "op": "subscribe",
+  "args": [
+    {
+      "channel": "kline15m",
+      "symbol": "ETH-USDC"
+    }
+  ]
+} Response: Copy {
+  "channel": "kline15m",
+  "symbol": "ETH-USDC"
+  "data": {
+    "0": 1499040000000,
+    "1": "0.01634790",
+    "2": "0.80000000",
+    "3": "0.01575800",
+    "4": "0.01577100",
+    "5": "148976.11427815",
+    "6": "2434.19055334",
+    "7": 308
+  }
+} Index Tickers Channel Path: /public Method: WebSocket Description: Channel to subscribe index ticker update Parameters: Copy ├─ op: String  (Operation, subscribe unsubscribe)
+└─ args: Array
+    ├─ channel: String (index:Index price) 
+    └─ symbol: String Response: Copy ├─ channel: String
+├─ symbol: String
+└─ data: Object
+   ├─ symbol: String
+   ├─ indexPrice: String
+   └─ time: Number Example: Request: Copy {
+  "op": "subscribe",
+  "args": [
+    {
+      "channel": "index",
+      "symbol": "ETH-USDC"
+    }
+  ]
+}
+ Response: Copy {
+  "channel": "index",
+  "symbol": "ETH-USDC"
+  "data": {
+    "symbol": "ETH-USDC",
+    "indexPrice": "28457",
+    "time": 1499865549590
+  }
+} Oracle Price Channel Path: /public Method: WebSocket Description: Channel to subscribe oracle price update Parameters: Copy ├─ op: String  (Operation, subscribe unsubscribe)
+└─ args: Array
+   ├─ channel: String  (oracle: Oracle price)
+   └─ symbol: String Response: Copy ├─ channel: String
+├─ symbol: String
+└─ data: Object
+   ├─ symbol: String
+   ├─ oraclePrice: String
+   └─ time: Number  (Effective time) Example: Request: Copy {
+  "op": "subscribe",
+  "args": [
+    {
+      "channel": "oracle",
+      "symbol": "ETH-USDC"
+    }
+  ]
+} Response: Copy {
+  "channel": "oracle",
+  "symbol": "ETH-USDC"
+  "data": {
+    "symbol": "ETH-USDC",
+    "oraclePrice": "28457",
+    "time": 1499865549590
+  }
+} Funding Rate Channel Path: /public Method: WebSocket Description: Channel to subscribe funding rate Parameters: Copy ├─ op: String  (Operation, subscribe unsubscribe)
+└─ args: Array
+    ├─ channel: String (funding:Funding rate) 
+    └─ symbol: String Response: Copy ├─ channel: String
+├─ symbol: String
+└─ data: Object
+   ├─ symbol: String
+   ├─ fundingRate: String
+   └─ time: Number Example: Request: Copy {
+  "op": "subscribe",
+  "args": [
+    {
+      "channel": "funding",
+      "symbol": "ETH-USDC"
+    }
+  ]
+} Response: Copy {
+  "channel": "funding",
+  "symbol": "ETH-USDC"
+  "data": {
+    "symbol": "ETH-USDC",
+    "fundingRate": "0.0008",
+    "time": 1499865549590
+  }
+} PreviousMarket Data Endpoints NextWebSocket Private Information Streams Last updated 1 year ago On this page WebSocket Format WebSocket Connect All Contracts Simplify Tickers Channel Single Contract Ticker Channel Order Book Channel Latest Trades Channel Kline Channel Index Tickers Channel Oracle Price Channel Funding Rate Channel
+
+
+Aboard DeFi-20 Index Methodology | Aboard Docs Products The Exchange Aboard Asset Management 📖Tokenomics For Beginner Video Tutorials Asset Management Tutorials For Fund Managers For Investors Financial Terms What are Futures and Perpetual Futures? Why Indices and Index Futures Matter? Order Book and Spread Explained What are Market Makers and Market Takers? Risk Management Avoid Getting Rekt How to Hedge your ANC Principal when participating in liquidity mining on Anchor? Trading Understanding Candlestick Charts How to Read Support and Resistance Market Order vs. Limit Order: When to Use Which? For developer API General Info Public Data Trades Endpoints Account Endpoints Market Data Endpoints WebSocket Public Information Streams WebSocket Private Information Streams Signature Operation GitHub Implementation Perpetuals Futures Expected Changes in Accounts Multi-position liquidation price calculation Multi-positions bankruptcy price calculation Funding Calculation Indices Aboard DeFi-20 Index Methodology Price Feeds Fund Terms Fees Social Media Powered by GitBook Index Objective: The DeFi Index is designed to measure the market performance of the DeFi sector by tracking the most representative 20 DeFi protocols. The index is weighted by adjusted market capitalization. Decentralized finance (DeFi) is an emerging financial technology based on blockchain technology similar to cryptocurrencies. It is a revolutionary technology that removes intermediaries and allows users to participate in a trustless way. Eligibility Criteria: Tokens must meet the following eligibility factors to be eligible for index consideration. Sector Classification: Only DeFi tokens are eligible. For Aboard DeFi Index, a DeFi token has the following characteristics: The token is listed in the DeFi sector of CoinGecko and CoinMarketCap simultaneously. The token must be associated with a decentralized finance protocol that falls in one or more of the following categories: decentralized exchanges, lending, assets management, insurance, payments, derivatives, venture capital, stablecoin protocol, and wallets. Each protocol is eligible for one token. For protocols with two or more tokens, the eligible token with the highest-ranking by market cap will be selected for the sample pool. Token Type: The token must not be considered a security across different jurisdictions. The token has to be related to a protocol. The token can not be a proof of ownership, i.e., CETH. The token can not be a legacy token. The token can not be a synthetic token whose value depends on the underlying’s price. Synthetic tokens include but are not limited to: Wrapped Token: A wrapped token represents a cryptocurrency from another blockchain or a different token standard. The wrapped token has the same value as the original token, i.e., WBTC is an ERC20 token backed 1:1 with Bitcoin. Stable Coins: a stablecoin is pegged to a real-world asset or currency, i.e., DAI is pegged to the U.S. dollar. Index Token: An index token tracks the performance of the underlying index, i.e., DPI is the token for DeFiPulse Token. Forex Token: A forex token tracks the performance of the underlying currency, i.e., sAUD tracks the performance of the Australian dollar. Exchange Listing: The token‘s spot product must be listed for hedging and security concerns on the major exchanges. Constituent Selection: The constituents are selected based on the following steps. Independently rank the tokens according to the standardized past year's daily average market cap data and the standardized monthly trading volume. Calculate a total score based on two ranking results: CS = MCR + MTVR Where: CS: Comprehensive Score for Token MCR: Market Cap Ranking (standardized MC) MTVR: Monthly Trading Volume Ranking (standardized MTVR) Rank all tokens based on a comprehensive score in descending order; Select the top 20 ranked tokens as the constituents. Index Calculation: The Aboard DeFi index is a capitalization-weighted index that follows the Laspeyres method. The method uses base period quantities (fixed quantity of tokens) to measure the price change of a basket of tokens. Index Maintenance: Reconstitution & Rebalancing: The index is reconstituted and rebalanced on a fixed schedule to maintain tracking precision: All eligible tokens are re-ranked based on the constituent selection procedure; The reconstitution procedure follows a buffer rule to reduce the turnover rate. Based on monthly ranking results, the index prioritizes including new candidate tokens in the top 15 and keeping original components in the top 25. The number of newly added tokens can not exceed 10% for each reconstitution; Each constituent's weight is rebalanced according to the updated price and market cap. The divisor will be adjusted accordingly. Active Adjustments: Active adjustment is a fail-safe mechanism that prevents a black swan event from significantly impacting the performance of the Aboard DeFi index. The adjustments occur at the Aboard Exchange’s discretion. Weight Recalculation: A constituent’s weight is recalculated when facing drastic changes in ex-ante or ex-post. The divisor will be adjusted accordingly. Deletion: A token is deleted from the index if an incident critically impacts the related project. Such events include but are not limited to: a catastrophic hacking incident, a sudden abandonment of the project, and complete removal of liquidity; A token that violates one or more of the eligibility criteria of the Aboard DeFi Index may be deleted from the index; The next available candidate ranked by the comprehensive score will substitute for the position. Timing of Changes: The index will be reconstituted and rebalanced monthly during the month's third week. Token and weight updates are announced before the changes. Active changes to the index composition are made on an as-needed basis. There is no scheduled reconstitution. Rather, changes in response to black swan events and market developments can be made anytime. Token and weight updates are announced before the changes. PreviousIndices NextPrice Feeds Last updated 11 months ago On this page Index Objective: Eligibility Criteria: Constituent Selection: Index Calculation: Index Maintenance:
+
+
+Signature Operation | Aboard Docs Products The Exchange Aboard Asset Management 📖Tokenomics For Beginner Video Tutorials Asset Management Tutorials For Fund Managers For Investors Financial Terms What are Futures and Perpetual Futures? Why Indices and Index Futures Matter? Order Book and Spread Explained What are Market Makers and Market Takers? Risk Management Avoid Getting Rekt How to Hedge your ANC Principal when participating in liquidity mining on Anchor? Trading Understanding Candlestick Charts How to Read Support and Resistance Market Order vs. Limit Order: When to Use Which? For developer API General Info Public Data Trades Endpoints Account Endpoints Market Data Endpoints WebSocket Public Information Streams WebSocket Private Information Streams Signature Operation GitHub Implementation Perpetuals Futures Expected Changes in Accounts Multi-position liquidation price calculation Multi-positions bankruptcy price calculation Funding Calculation Indices Aboard DeFi-20 Index Methodology Price Feeds Fund Terms Fees Social Media Powered by GitBook For example: Copy https://api.aboard.exchange/bsc/api/v1/order/orders?
+orderId=1234567890&clientId=7623910&beginTime=1634437275876
+
+Header:
+ABOARD-API-KEY: e2xxxxxx-99xxxxxx-84xxxxxx-7xxxx 
+ABOARD-TIMESTAMP:1637115675000 
+ABOARD-SIGNATURE:4F65x5A2bLyMWVQj3Aqp+B4w+ivaA7n5Oi2SuYtCJ9o= The signature may be different if the request text is different, therefore the request should be normalized before signing. The following signature steps will take the order query on the above side as an example. Signature Method: 1. The request Method (GET or POST, WebSocket use GET), append line break "\n" Copy GET\n 2. The host with lower case, append line break "\n" Copy api.aboard.exchange\n 3. The path(WebSocket is fixed to /users/self/verify), append line break "\n". (Take the path from /api, such as /bsc/api/v1/order/orders, which is actually /api/v1/order/orders) Copy /api/v1/order/orders\n 4. Timestamp, append line break "\n" Copy 1637115675000\n 5. API Access Key, append line break "\n" if parameters are not empty. Notice, "data" in Post method is not parameter. Copy e2xxxxxx-99xxxxxx-84xxxxxx-7xxxx\n 6. The parameters are URL encoded, and ordered based on ASCII(Use UTF-8 encoding and URL encoded, the hex must be upper case. For example, The semicolon ':' should be encoded as '%3A', The space should be encoded as '%20'). For example below is the original parameters: Copy orderId=1234567890
+clientId=7623910
+beginTime=1634437275876 Then above parameter should be ordered like below: Copy beginTime=1634437275876
+clientId=7623910
+orderId=1234567890 Use char "&" to concatenate all parameters. Copy beginTime=1634437275876&clientId=7623910&orderId=1234567890 7. Assemble the pre-signed text: Copy GET\napi.aboard.exchange\n/api/v1/order/orders\n1637115675000\ne2xxxxxx-99xxxxxx-84xxxxxx-7xxxx\nbeginTime=1634437275876&clientId=7623910&orderId=1234567890 8. Calculate the signature and pass the following two parameters into the encrypted hash function(HmacSHA256): pre-signed text Copy GET\napi.aboard.exchange\n/api/v1/order/orders\n1637115675000\ne2xxxxxx-99xxxxxx-84xxxxxx-7xxxx\nbeginTime=1634437275876&clientId=7623910&orderId=1234567890 your Secret Key Copy b0xxxxxx-c6xxxxxx-94xxxxxx-dxxxx Encode the hash code with base-64 to generate the signature Copy 4F65x5A2bLyMWVQj3Aqp+B4w+ivaA7n5Oi2SuYtCJ9o= 9. Put the signature into request header 'ABOARD-SIGNATURE'. PreviousWebSocket Private Information Streams NextGitHub Last updated 1 year ago On this page For example: Signature Method:
+
+
+Price Feeds | Aboard Docs Products The Exchange Aboard Asset Management 📖Tokenomics For Beginner Video Tutorials Asset Management Tutorials For Fund Managers For Investors Financial Terms What are Futures and Perpetual Futures? Why Indices and Index Futures Matter? Order Book and Spread Explained What are Market Makers and Market Takers? Risk Management Avoid Getting Rekt How to Hedge your ANC Principal when participating in liquidity mining on Anchor? Trading Understanding Candlestick Charts How to Read Support and Resistance Market Order vs. Limit Order: When to Use Which? For developer API General Info Public Data Trades Endpoints Account Endpoints Market Data Endpoints WebSocket Public Information Streams WebSocket Private Information Streams Signature Operation GitHub Implementation Perpetuals Futures Expected Changes in Accounts Multi-position liquidation price calculation Multi-positions bankruptcy price calculation Funding Calculation Indices Aboard DeFi-20 Index Methodology Price Feeds Fund Terms Fees Social Media Powered by GitBook Index Price: Aboard uses Index prices to calculate the funding rate. The current index price is a volume-weighted formula based on the spot price from Binance, Huobi, Kucoin, and OKX. Oracle Price: Aboard uses Oralce prices to calculate the liquidation price. The current Oracle price is a weighted formula based on the Index price and the order book price from Aboard Exchange. PreviousAboard DeFi-20 Index Methodology NextFund Terms Last updated 11 months ago On this page Index Price: Oracle Price:
+
+
+Asset Management Tutorials | Aboard Docs Products The Exchange Aboard Asset Management 📖Tokenomics For Beginner Video Tutorials Asset Management Tutorials For Fund Managers For Investors Financial Terms What are Futures and Perpetual Futures? Why Indices and Index Futures Matter? Order Book and Spread Explained What are Market Makers and Market Takers? Risk Management Avoid Getting Rekt How to Hedge your ANC Principal when participating in liquidity mining on Anchor? Trading Understanding Candlestick Charts How to Read Support and Resistance Market Order vs. Limit Order: When to Use Which? For developer API General Info Public Data Trades Endpoints Account Endpoints Market Data Endpoints WebSocket Public Information Streams WebSocket Private Information Streams Signature Operation GitHub Implementation Perpetuals Futures Expected Changes in Accounts Multi-position liquidation price calculation Multi-positions bankruptcy price calculation Funding Calculation Indices Aboard DeFi-20 Index Methodology Price Feeds Fund Terms Fees Social Media Powered by GitBook For Fund Managers For Investors PreviousVideo Tutorials NextFor Fund Managers Last updated 10 months ago On this page
+
+
+Expected Changes in Accounts | Aboard Docs Products The Exchange Aboard Asset Management 📖Tokenomics For Beginner Video Tutorials Asset Management Tutorials For Fund Managers For Investors Financial Terms What are Futures and Perpetual Futures? Why Indices and Index Futures Matter? Order Book and Spread Explained What are Market Makers and Market Takers? Risk Management Avoid Getting Rekt How to Hedge your ANC Principal when participating in liquidity mining on Anchor? Trading Understanding Candlestick Charts How to Read Support and Resistance Market Order vs. Limit Order: When to Use Which? For developer API General Info Public Data Trades Endpoints Account Endpoints Market Data Endpoints WebSocket Public Information Streams WebSocket Private Information Streams Signature Operation GitHub Implementation Perpetuals Futures Expected Changes in Accounts Multi-position liquidation price calculation Multi-positions bankruptcy price calculation Funding Calculation Indices Aboard DeFi-20 Index Methodology Price Feeds Fund Terms Fees Social Media Powered by GitBook Equity: a2=a1−abs(Sopen ∗Popen ∗ feerate )+(Po−Popen )∗Sopen a_{2}=a_{1}-\mathrm{abs}\left(S_{\text {open }} * P_{\text {open }} * \text { feerate }\right)+\left(P^{o}-P_{\text {open }}\right) * S_{\text {open }} \\ Maintenance: c2= otTMM +abs⁡(e2)∗Po∗ MaintenanceRate c_{2}=\text { otTMM }+\operatorname{abs}\left(e_{2}\right) * P^{o} * \text { MaintenanceRate } \\ Margin Ratio: d2=c2a2(0≤d2≤1)d_{2}=\frac{c_{2}}{a_{2}}\left(0 \leq d_{2} \leq 1\right) Position: e2=Shold +Sopen e_{2}=S_{\text {hold }}+S_{\text {open }} \\ Fee: b1=abs⁡(Sopen ∗ feerate ∗Popen )\mathrm{b} 1=\operatorname{abs}\left(S_{\text {open }} * \text { feerate } * P_{\text {open }}\right) Position Size: SholdS_{\text {hold}} Average Position Price: PholdP_{\text {hold}} Oracle Price: PoP^{o} Open Size: SopenS_{\text {open}} Open Price: PopenP_{\text {open}} otTMM: Sum of maintenance margins for other contracts Long: + short: - PreviousPerpetuals Futures NextMulti-position liquidation price calculation Last updated 2 years ago On this page
+
+
+Multi-positions bankruptcy price calculation | Aboard Docs Products The Exchange Aboard Asset Management 📖Tokenomics For Beginner Video Tutorials Asset Management Tutorials For Fund Managers For Investors Financial Terms What are Futures and Perpetual Futures? Why Indices and Index Futures Matter? Order Book and Spread Explained What are Market Makers and Market Takers? Risk Management Avoid Getting Rekt How to Hedge your ANC Principal when participating in liquidity mining on Anchor? Trading Understanding Candlestick Charts How to Read Support and Resistance Market Order vs. Limit Order: When to Use Which? For developer API General Info Public Data Trades Endpoints Account Endpoints Market Data Endpoints WebSocket Public Information Streams WebSocket Private Information Streams Signature Operation GitHub Implementation Perpetuals Futures Expected Changes in Accounts Multi-position liquidation price calculation Multi-positions bankruptcy price calculation Funding Calculation Indices Aboard DeFi-20 Index Methodology Price Feeds Fund Terms Fees Social Media Powered by GitBook bankruptcy Price: The bankruptcy price of the Ith  I^{\text {th}}\;contract (PiC)(P_i^C): Pic=Pi−[BI+∑k=1nSk∗(Pk−Pko)]∗dir⁡i∗Mi∗Pi∑k=1ndir⁡k∗Sk∗Mk∗Pk1−dir⁡i∗ FeeRate P_{i}^{c}=\frac{P_{i}-\left[B I+\sum_{k=1}^{n} S_{k} *\left(P_{k}-P_{k}^{o}\right)\right] * \frac{\operatorname{dir}_{i} * M_{i} * P_{i}}{\sum_{k=1}^{n} \operatorname{dir}_{k} * S_{k^{*} M_{k} * P_{k}}}}{1-\operatorname{dir}_{i} * \text { FeeRate }} Variables: BIBI: Static account equity Pi:P_i:Current oracle price of the Ith  I^{\text {th}}\;contract PiC:P_i^C:The bankruptcy price of the Ith  I^{\text {th}}\;contract Pi0P_i^0: The opening price of the Ith  I^{\text {th}}\;contract Si:S_i: The number of open positions of the Ith  I^{\text {th}}\;contract, positive for long positions and negative for short positions. diri:dir_i: The opening direction of the Ith  I^{\text {th}}\;contract, +1 for long positions and -1 for short positions Mi:M_i:Maintenance margin rate of the Ith  I^{\text {th}}\;contract Example: Initial account balance BI=1000BI = 1000USDC, Trading Fee = 0.3% Contract Type Open Positions Opening Price Current Price Maintenance Margin PNL ETH 4 1100 1000 200(5%) -400 BTC 2 2200 2000 400(10%) -400 AVA -3 2100 2000 300(5%) 300 ETH bankruptcy Price: 1000−[1000+(−400−400+300)]∗0.05∗1000200+400+3001−0.003=975.15\frac{1000-[1000+(-400-400+300) ] * \frac{0.05 * 1000}{200+400+300 }}{1-0.003}=975.15 BTC bankruptcy Price: 2000−[1000+(−400−400+300)]∗0.1∗2000200+400+3001−0.003=1894.57\frac{2000-[1000+(-400-400+300) ] * \frac{0.1 * 2000}{200+400+300 }}{1-0.003}=1894.57 AVA bankruptcy Price: 2000−[1000+(−400−400+300)]∗−1∗0.05∗2000200+400+3001+0.003=2049.40\frac{2000-[1000+(-400-400+300) ] * \frac{-1*0.05 *2000}{200+400+300 }}{1+0.003}=2049.40 ETH PNL: (975.15−1100)∗4−975.15∗4∗0.003=−511.1018(975.15-1100)*4-975.15*4*0.003=-511.1018 BTC PNL: (1894.57−2200)∗2−1894.57∗2∗0.003=−622.23(1894.57-2200)*2-1894.57*2*0.003=-622.23 AVA PNL: (2049.40−2100)∗−3−2049.40∗3∗0.003=133.354(2049.40-2100)*-3-2049.40*3*0.003=133.354 PreviousMulti-position liquidation price calculation NextFunding Calculation Last updated 1 year ago On this page bankruptcy Price: Example:
+
+
+Trading | Aboard Docs Products The Exchange Aboard Asset Management 📖Tokenomics For Beginner Video Tutorials Asset Management Tutorials For Fund Managers For Investors Financial Terms What are Futures and Perpetual Futures? Why Indices and Index Futures Matter? Order Book and Spread Explained What are Market Makers and Market Takers? Risk Management Avoid Getting Rekt How to Hedge your ANC Principal when participating in liquidity mining on Anchor? Trading Understanding Candlestick Charts How to Read Support and Resistance Market Order vs. Limit Order: When to Use Which? For developer API General Info Public Data Trades Endpoints Account Endpoints Market Data Endpoints WebSocket Public Information Streams WebSocket Private Information Streams Signature Operation GitHub Implementation Perpetuals Futures Expected Changes in Accounts Multi-position liquidation price calculation Multi-positions bankruptcy price calculation Funding Calculation Indices Aboard DeFi-20 Index Methodology Price Feeds Fund Terms Fees Social Media Powered by GitBook Understanding Candlestick Charts How to Read Support and Resistance Market Order vs. Limit Order: When to Use Which? PreviousRisk Management NextAPI Last updated 1 year ago On this page
+
+
+API | Aboard Docs Products The Exchange Aboard Asset Management 📖Tokenomics For Beginner Video Tutorials Asset Management Tutorials For Fund Managers For Investors Financial Terms What are Futures and Perpetual Futures? Why Indices and Index Futures Matter? Order Book and Spread Explained What are Market Makers and Market Takers? Risk Management Avoid Getting Rekt How to Hedge your ANC Principal when participating in liquidity mining on Anchor? Trading Understanding Candlestick Charts How to Read Support and Resistance Market Order vs. Limit Order: When to Use Which? For developer API General Info Public Data Trades Endpoints Account Endpoints Market Data Endpoints WebSocket Public Information Streams WebSocket Private Information Streams Signature Operation GitHub Implementation Perpetuals Futures Expected Changes in Accounts Multi-position liquidation price calculation Multi-positions bankruptcy price calculation Funding Calculation Indices Aboard DeFi-20 Index Methodology Price Feeds Fund Terms Fees Social Media Powered by GitBook Aboard Perpetual API General Info Public Data Trades Endpoints Account Endpoints Market Data Endpoints WebSocket Public Information Streams WebSocket Private Information Streams Signature Operation PreviousTrading NextGeneral Info Last updated 2 years ago On this page
+
+
+Fund Terms | Aboard Docs Products The Exchange Aboard Asset Management 📖Tokenomics For Beginner Video Tutorials Asset Management Tutorials For Fund Managers For Investors Financial Terms What are Futures and Perpetual Futures? Why Indices and Index Futures Matter? Order Book and Spread Explained What are Market Makers and Market Takers? Risk Management Avoid Getting Rekt How to Hedge your ANC Principal when participating in liquidity mining on Anchor? Trading Understanding Candlestick Charts How to Read Support and Resistance Market Order vs. Limit Order: When to Use Which? For developer API General Info Public Data Trades Endpoints Account Endpoints Market Data Endpoints WebSocket Public Information Streams WebSocket Private Information Streams Signature Operation GitHub Implementation Perpetuals Futures Expected Changes in Accounts Multi-position liquidation price calculation Multi-positions bankruptcy price calculation Funding Calculation Indices Aboard DeFi-20 Index Methodology Price Feeds Fund Terms Fees Social Media Powered by GitBook Fund Risk Level: The risk factor depends on the stop-loss line. A lower stop-loss percentage means higher risk. Currently, the highest stop-loss line is 0.95, and the lowest stop-loss line is 0.55. Risk Level Stop-Loss Interval 1 0.9 - 0.95 2 0.85 - 0.9 3 0.75 - 0.8 4 0.65 - 0.75 5 0.55 - 0.65 Fund Score Calculation The fund score depends on return, volatility, and average daily AUM of the past 30 days. For funds with less than 30 days of the track record, the score depends on the total live days. The lowest score is 0. Score=30DayReturn30DayNAVStandardDeviation∗30DayDailyAUMScore = \frac{30 DayReturn }{30DayNAVStandardDeviation} * \sqrt{30DayDailyAUM} PreviousPrice Feeds NextFees Last updated 9 months ago On this page Fund Risk Level: Fund Score Calculation
+
+
+Financial Terms | Aboard Docs Products The Exchange Aboard Asset Management 📖Tokenomics For Beginner Video Tutorials Asset Management Tutorials For Fund Managers For Investors Financial Terms What are Futures and Perpetual Futures? Why Indices and Index Futures Matter? Order Book and Spread Explained What are Market Makers and Market Takers? Risk Management Avoid Getting Rekt How to Hedge your ANC Principal when participating in liquidity mining on Anchor? Trading Understanding Candlestick Charts How to Read Support and Resistance Market Order vs. Limit Order: When to Use Which? For developer API General Info Public Data Trades Endpoints Account Endpoints Market Data Endpoints WebSocket Public Information Streams WebSocket Private Information Streams Signature Operation GitHub Implementation Perpetuals Futures Expected Changes in Accounts Multi-position liquidation price calculation Multi-positions bankruptcy price calculation Funding Calculation Indices Aboard DeFi-20 Index Methodology Price Feeds Fund Terms Fees Social Media Powered by GitBook PreviousFor Investors NextRisk Management Last updated 1 year ago On this page
+
+
+Perpetuals Futures | Aboard Docs Products The Exchange Aboard Asset Management 📖Tokenomics For Beginner Video Tutorials Asset Management Tutorials For Fund Managers For Investors Financial Terms What are Futures and Perpetual Futures? Why Indices and Index Futures Matter? Order Book and Spread Explained What are Market Makers and Market Takers? Risk Management Avoid Getting Rekt How to Hedge your ANC Principal when participating in liquidity mining on Anchor? Trading Understanding Candlestick Charts How to Read Support and Resistance Market Order vs. Limit Order: When to Use Which? For developer API General Info Public Data Trades Endpoints Account Endpoints Market Data Endpoints WebSocket Public Information Streams WebSocket Private Information Streams Signature Operation GitHub Implementation Perpetuals Futures Expected Changes in Accounts Multi-position liquidation price calculation Multi-positions bankruptcy price calculation Funding Calculation Indices Aboard DeFi-20 Index Methodology Price Feeds Fund Terms Fees Social Media Powered by GitBook PreviousGitHub NextExpected Changes in Accounts Last updated 2 years ago On this page
+
+

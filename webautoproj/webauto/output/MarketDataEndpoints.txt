@@ -1,0 +1,140 @@
+Market Data Endpoints | Aboard Docs Products The Exchange Aboard Asset Management 📖Tokenomics For Beginner Video Tutorials Asset Management Tutorials For Fund Managers For Investors Financial Terms What are Futures and Perpetual Futures? Why Indices and Index Futures Matter? Order Book and Spread Explained What are Market Makers and Market Takers? Risk Management Avoid Getting Rekt How to Hedge your ANC Principal when participating in liquidity mining on Anchor? Trading Understanding Candlestick Charts How to Read Support and Resistance Market Order vs. Limit Order: When to Use Which? For developer API General Info Public Data Trades Endpoints Account Endpoints Market Data Endpoints WebSocket Public Information Streams WebSocket Private Information Streams Signature Operation GitHub Implementation Perpetuals Futures Expected Changes in Accounts Multi-position liquidation price calculation Multi-positions bankruptcy price calculation Funding Calculation Indices Aboard DeFi-20 Index Methodology Price Feeds Fund Terms Fees Social Media Powered by GitBook Query All Contract Markets Path: /api/v1/market/tickers Method: GET Description: Query all contract markets data Parameters: Copy Response: Copy ├─ code: Number
+├─ msg: String
+└─ data: Array
+    ├─ symbol: String
+    ├─ priceChange: String  (24-hour price change)
+    ├─ priceChangePercent: String  (Percentage of 24-hour price change)
+    ├─ lastPrice: String  (Last trades price)
+    ├─ lastQty: String  (Last trades amount)
+    ├─ openPrice: String  (Price of the first trades within 24 hours)
+    ├─ highPrice: String  (24-hour maximum price)
+    ├─ lowPrice: String  (24-hour lowest price)
+    ├─ volume: String  (24-hour trades quantity)
+    ├─ quoteVolume: String  (24-hour trades amount)
+    └─ count: Number  (24-hour trades count) Example: Request: Copy https://api.aboard.exchange/arbitrum/api/v1/market/tickers Response: Copy {
+  "code": 0,
+  "msg": "",
+  "data": [
+    {
+      "symbol": "ETH-USDC",
+      "priceChange": "-94.99999800",
+      "priceChangePercent": "-95.960",
+      "lastPrice": "4.00000200",
+      "lastQty": "200.00000000",
+      "openPrice": "99.00000000",
+      "highPrice": "100.00000000",
+      "lowPrice": "0.10000000",
+      "volume": "8913.30000000",
+      "quoteVolume": "15.30000000",
+      "count": 76
+    }
+  ]
+} Query Contract Market Path: /api/v1/market/ticker Method: GET Description: Query contract market by symbol Parameters: Copy └─ symbol: String (Mandatory) Response: Copy ├─ code: Number
+├─ msg: String
+└─ data: Object
+   ├─ symbol: String
+   ├─ priceChange: String  (24-hour price change)
+   ├─ priceChangePercent: String  (Percentage of 24-hour price change)
+   ├─ lastPrice: String  (Last trades price)
+   ├─ lastQty: String  (Last trades amount)
+   ├─ openPrice: String  (Price of the first trades within 24 hours)
+   ├─ highPrice: String  (24-hour maximum price)
+   ├─ lowPrice: String  (24-hour lowest price)
+   ├─ volume: String  (24-hour trades quantity)
+   ├─ quoteVolume: String  (24-hour trades amount)
+   └─ count: Number  (24-hour trades count) Example: Request: Copy https://api.aboard.exchange/arbitrum/api/v1/market/tickers?symbol=ETH-USDC Response: Copy {
+  "code": 0,
+  "msg": "",
+  "data": {
+    "symbol": "ETH-USDC",
+    "priceChange": "-94.99999800",
+    "priceChangePercent": "-95.960",
+    "lastPrice": "4.00000200",
+    "lastQty": "200.00000000",
+    "openPrice": "99.00000000",
+    "highPrice": "100.00000000",
+    "lowPrice": "0.10000000",
+    "volume": "8913.30000000",
+    "quoteVolume": "15.30000000",
+    "count": 76
+  }
+} Order Book Path: /api/v1/market/depth Method: GET Description: Query order book Parameters: Copy ├─ symbol: String (Mandatory)
+└─ limit: Number  (Default 20; Valid limits:[5, 10, 20, 50, 100]) Response: Copy ├─ code: Number
+├─ msg: String
+└─ data: Object
+   ├─ bids: Array (Buy)
+   │  ├─ 0: String  (price, 1st bit of array)
+   │  └─ 1: String  (quantity, 2nd bit of array)
+   ├─ asks: Array (Sell)
+   │  ├─ 0: String  (price, 1st bit of array)
+   │  └─ 1: String  (quantity, 2nd bit of array)
+   └─ time: Number Example: Request: Copy https://api.aboard.exchange/arbitrum/api/v1/market/depth?symbol=ETH-USDC&limit=1 Response: Copy {
+  "code": 0,
+  "msg": "",
+  "data": {
+    "bids": [
+      {
+        "0": "4.00000000",
+        "1": "431.00000000"
+      }
+    ],
+    "asks": [
+      {
+        "0": "4.00000200",
+        "1": "12.00000000"
+      }
+    ],
+    "time": 1569514978020
+  }
+} Query Latest Trades Path: /api/v1/market/trades Method: GET Description: Query latest trades Parameters: Copy ├─ symbol: String (Mandatory)
+└─ limit: Number  (Default 100, maximum 500) Response: Copy ├─ code: Number
+├─ msg: String
+└─ data: Array
+   ├─ id: String  (trades id)
+   ├─ price: String  (trades price)
+   ├─ qty: String  (trades quantity)
+   ├─ time: Number
+   ├─ side: String
+   └─ maker: Boolean  (if maker) Example: Request: Copy https://api.aboard.exchange/arbitrum/api/v1/market/trades?symbol=ETH-USDC&limit=1 Response: Copy {
+  "code": 0,
+  "msg": "",
+  "data": [
+    {
+      "id": "28457",
+      "price": "4.00000100",
+      "qty": "12.00000000",
+      "time": 1499865549590,
+      "side": "SELL",
+      "maker": false
+    }
+  ]
+} Kline Path: /api/v1/market/klines Method: GET Description: Get kline data Parameters: Copy ├─ symbol: String (Mandatory)
+├─ interval: String (Mandatory) (time interval: kline1m,kline5m,kline15m,kline30m,kline1h,kline4h,kline1d)
+├─ startTime: Number
+├─ endTime: Number
+└─ limit: Number  (Number of result sets returned, default:100 maximum:500) Response: Copy ├─ code: Number
+├─ msg: String
+└─ data: Array
+   ├─ 0: Number  (Open time)
+   ├─ 1: String  (Open)
+   ├─ 2: String  (Hign)
+   ├─ 3: String  (Low)
+   ├─ 4: String  (Close (or latest price))
+   ├─ 5: String  (Trades quantity)
+   ├─ 6: String  (Trades amount)
+   └─ 7: Number  (Trades count) Example: Request: Copy https://api.aboard.exchange/arbitrum/api/v1/market/klines?symbol=ETH-USDC&interval=15m&startTime=1628575642000&endTime=1628585642000&limit=100 Response: Copy {
+  "code": 0,
+  "msg": "",
+  "data": [
+    {
+      "0": 1499040000000,
+      "1": "0.01634790",
+      "2": "0.80000000",
+      "3": "0.01575800",
+      "4": "0.01577100",
+      "5": "148976.11427815",
+      "6": "2434.19055334",
+      "7": 308
+    }
+  ]
+} PreviousAccount Endpoints NextWebSocket Public Information Streams Last updated 1 year ago On this page Query All Contract Markets Query Contract Market Order Book Query Latest Trades Kline

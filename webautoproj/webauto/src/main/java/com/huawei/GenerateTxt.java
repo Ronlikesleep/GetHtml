@@ -14,14 +14,14 @@ public class GenerateTxt {
         }
     }
 
-    public void getWholeText(){
+    public void getWholeText(String targetName){
         String res = " ";
         for(Map.Entry<String, String> entry:urlMap.entrySet()){
             String text = GetHtml.getText(entry.getValue());
             res+=text;
             res += "\n\n\n";
         }
-        GetHtml.exportTxt("WholeText", res);
+        GetHtml.exportTxt(targetName, res);
     }
 
 }

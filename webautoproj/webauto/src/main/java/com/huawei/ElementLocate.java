@@ -6,7 +6,9 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +31,33 @@ public class ElementLocate {
         openChrome();
         chromeDriver.navigate().to(targetUrl);
         chromeDriver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        String targetTagName = "nav";
+        String targetTagName1 = "aside";
+        String targetTagName2 = "nav";
+        String targetTagName;
+        WebElement navElement1 = null;
+        WebElement navElement2 = null;
+        try {
+            navElement1 = chromeDriver.findElement(By.tagName(targetTagName1));
+        } catch (NoSuchElementException e) {
+            System.out.println("Element with tag name " + targetTagName1 + " not found.");
+        }
+        try {
+            navElement2 = chromeDriver.findElement(By.tagName(targetTagName2));
+        } catch (NoSuchElementException e) {
+            System.out.println("Element with tag name " + targetTagName2 + " not found.");
+        }
+
+        List<WebElement> list1 = navElement1 != null ? navElement1.findElements(By.tagName("a"))
+                : Collections.emptyList();
+        List<WebElement> list2 = navElement2 != null ? navElement2.findElements(By.tagName("a"))
+                : Collections.emptyList();
+
+        if (list1.size() >= list2.size()) {
+            targetTagName = targetTagName1;
+        } else {
+            targetTagName = targetTagName2;
+        }
+
         WebElement navElement = chromeDriver.findElement(By.tagName(targetTagName));
         List<WebElement> list = navElement.findElements(By.tagName("a"));
         WebDriverWait wait = new WebDriverWait(chromeDriver, 10);
